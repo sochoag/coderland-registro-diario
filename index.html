@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://portal-colaborador.coderland.com; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://*.workers.dev; base-uri 'none'; form-action 'none'">
 <title>Horas Coderland</title>
 <style>
 :root{--bg:#f5f6f8;--card:#fff;--ink:#14171f;--mut:#667085;--line:#e4e7ec;--btn:#111827;--btnink:#fff;--ok:#067647;--bad:#b42318;--warn:#b54708;--chip:#eef1f5}
@@ -72,7 +72,8 @@ td input{padding:6px 8px}
 </div>
 </main>
 <script>
-const BASE="https://portal-colaborador.coderland.com/v1/";
+// URL de tu Worker (termina en /v1/). Cambiala tras hacer deploy.
+const BASE="https://coderland-proxy.sochoag.workers.dev/v1/";
 const PROJECT_ID=732, ACTIVITY_ID=9, DEFAULT_HOURS=8;
 const $=id=>document.getElementById(id);
 const DATE_RE=/^\d{4}-\d{2}-\d{2}$/;
@@ -86,7 +87,7 @@ async function call(method,path,body){
   try{
     r=await fetch(BASE+path,{method,headers:Object.assign({"Authorization":"Bearer "+TOKEN},body!==undefined?{"Content-Type":"application/json"}:{}),body:body!==undefined?JSON.stringify(body):undefined});
   }catch(e){
-    throw new ApiError(0,"No se pudo contactar al portal. Si en la consola aparece un error de CORS, el portal no permite llamadas desde esta página.");
+    throw new ApiError(0,"No se pudo contactar al portal. Si en la consola aparece un error de CORS, el proxy no está bien configurado (revisa BASE y ALLOWED_ORIGIN).");
   }
   if(r.status===401){logout(true);throw new ApiError(401,"Sesión vencida. Inicia sesión de nuevo.");}
   if(r.status>=400){let t="";try{t=(await r.text()).slice(0,300);}catch(e){}throw new ApiError(r.status,method+" "+path+" → "+r.status+": "+t);}
